@@ -54,7 +54,7 @@
                 <span><apex:commandLink action="{!lastPage}" value="[Last Page]" rerender="form" status="loading"/></span>
             </center>
             <right>
-            	<span>Viewing page {!currentPage} of {!mapsize} ({!currentPage * 1000 - 999}-{!currentPage * 1000})</span>
+            	<span>Viewing page {!currentPage} of {!mapsize} ({!currentPage * 100 - 99}-{!currentPage * 100})</span>
             </right>
             <apex:pageBlockTable value="{!mods[currentPage]}" var="m">
                 <apex:column >
