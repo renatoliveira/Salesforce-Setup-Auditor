@@ -1,0 +1,48 @@
+@isTest
+public class UserSetupControllerTest 
+{
+	@isTest public static void test_constructor()
+    {
+        User u = UserSetupControllerTest.criaUsuario('TestUser');
+        insert u;
+        
+        UserSetupController controller = new UserSetupController();
+        
+        for (UserWrapper w : controller.users)
+        {
+            if (w.u.Id == u.Id)
+            {
+                w.IsActive = false;
+            }
+        }
+        
+        controller.deactivateSelected();
+        
+        for (UserWrapper w : controller.users)
+        {
+            if (w.u.Id == u.Id)
+            {
+                w.IsActive = true;
+            }
+        }
+        
+        controller.activateSelected();
+    }
+    
+    public static User criaUsuario(string nome)
+    {
+        Profile p = [SELECT Id FROM Profile WHERE Id= :UserInfo.getProfileId()];
+        return new User(firstName = nome,
+                        userName = nome + '@foxycloud.com', 
+                        LastName = 'Foxy', 
+                        email = nome + '@foxycloud.com', 
+                        alias= 'tst',
+                        communityNickname = nome,
+                        languagelocalekey='en_US', 
+                        localesidkey='en_US', 
+                        profileid = p.Id,
+                        timezonesidkey='America/Los_Angeles',
+                        emailencodingkey='UTF-8'
+                        );  
+    }
+}

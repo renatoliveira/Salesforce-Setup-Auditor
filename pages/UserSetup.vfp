@@ -1,0 +1,19 @@
+<apex:page controller="UserSetupController" language="en_US">
+    <apex:form id="form">
+    	<apex:pageBlock>
+            <apex:pageMessages></apex:pageMessages>
+        	<apex:pageBlockTable var="w" value="{!users}">
+                <apex:column headerValue="Is active?">
+                	<apex:inputCheckbox value="{!w.isActive}"/>
+                </apex:column>
+                <apex:column headerValue="Last Name" value="{!w.u.LastName}"/>
+                <apex:column headerValue="First Name" value="{!w.u.FirstName}"/>
+                <apex:column headerValue="License" value="{!w.u.UserType}"/>
+            </apex:pageBlockTable>
+            <apex:pageBlockButtons>
+            	<apex:commandButton action="{!activateSelected}" value="Activate Selected" rerender="form"/>
+                <apex:commandButton action="{!deactivateSelected}" value="Deactivate Unselected" rerender="form"/>
+            </apex:pageBlockButtons>
+        </apex:pageBlock>
+    </apex:form>
+</apex:page>

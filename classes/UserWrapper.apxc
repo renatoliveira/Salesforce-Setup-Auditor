@@ -1,0 +1,11 @@
+public class UserWrapper
+{
+    public User u {get;set;}
+    public Boolean isActive {get;set;}
+    
+    public UserWrapper(User u)
+    {
+        this.u = u;
+        this.isActive = u.IsActive;
+    }
+}

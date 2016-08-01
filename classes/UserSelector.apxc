@@ -1,0 +1,45 @@
+public class UserSelector
+{
+    public static String queryBuilder()
+    {
+        String query = 'SELECT ';
+        for (String field : User.sObjectType.getDescribe().fields.getMap().keySet())
+        {
+            query += field + ', ';
+        }
+        query = query.removeEnd(', ');
+        query += ' FROM User';
+        System.debug(query);
+        return query;
+    }
+    
+    public static User getById(String userId)
+    {
+        String query = queryBuilder();
+        List<User> result;
+        try
+        {
+            result = (List<User>) Database.query(query + ' WHERE Id = \'' + userId + '\'');
+            return result[0];
+        }
+        catch (Exception e)
+        {
+            return null;
+        }
+    }
+    
+    public static List<User> getAll()
+    {
+        String query = queryBuilder();
+        List<User> result;
+        try
+        {
+            result = (List<User>) Database.query(query);
+            return result;
+        }
+        catch (Exception e)
+        {
+            return null;
+        }
+    }
+}

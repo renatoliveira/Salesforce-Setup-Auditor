@@ -1,0 +1,8 @@
+@isTest
+public class UserSelectorTest
+{
+	@isTest public static void test_selectById()
+    {
+        User u = UserSelector.getById(UserInfo.getUserId());
+    }
+}

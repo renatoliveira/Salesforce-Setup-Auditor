@@ -1,0 +1,93 @@
+public class UserSetupController
+{
+    public List<UserWrapper> users {get;set;}
+    
+	public UserSetupController()
+    {
+        this.users = new List<UserWrapper>();
+        getAllUsers();
+    }
+    
+    public void getAllUsers()
+    {
+        this.users.clear();
+        
+        List<User> users = UserSelector.getAll();
+        
+        for (User u : users)
+        {
+            this.users.add(new UserWrapper(u));
+        }
+        
+        System.debug(users.size());
+    }
+    
+    public void deactivateSelected()
+    {
+        List<User> toupdate = new List<User>();
+        
+        for (User currentUser : [SELECT Id, IsActive FROM User])
+        {
+            for (UserWrapper u : users)
+            {
+                if (currentUser.Id == u.u.Id)
+                {
+                    if (currentUser.IsActive && !u.IsActive)
+                    {
+                        toupdate.add(currentUser);
+                        currentUser.IsActive = false;
+                        break;
+                    }
+                }
+            }
+        }
+        
+        try
+        {
+            update toupdate;
+        	ApexPages.addMessage(new ApexPages.message(ApexPages.Severity.CONFIRM, toupdate.size() + ' users were deactivated.'));
+        }
+        catch (Exception e)
+        {
+            ApexPages.addMessage(new ApexPages.message(ApexPages.Severity.ERROR, 'It was not possible to deactivate one or more users. ' +
+                                                      'Please not that Salesforce does not allow certain users to be deactivated'));
+        }
+        getAllUsers();
+    }
+    
+    public void activateSelected()
+    {
+        List<User> toupdate = new List<User>();
+        
+        for (User currentUser : [SELECT Id, IsActive FROM User])
+        {
+            for (UserWrapper u : users)
+            {
+                if (currentUser.Id == u.u.Id)
+                {
+                    if (!currentUser.IsActive && u.IsActive)
+                    {
+                        toupdate.add(currentUser);
+                        currentUser.IsActive = true;
+                        break;
+                    }
+                }
+            }
+        }
+        
+        try
+        {
+            update toupdate;
+        	ApexPages.addMessage(new ApexPages.message(ApexPages.Severity.CONFIRM, toupdate.size() + ' users were activated.'));
+        }
+        catch (Exception e)
+        {
+            ApexPages.addMessage(new ApexPages.message(ApexPages.Severity.ERROR, 'It was not possible to activate ' + toupdate.size() +
+                                                       ' users. You might have reached the limit of licenses purchased. ' +
+                                                       'Please try deactivating one or more users before trying to activate more users.'));
+        }
+        
+        
+        getAllUsers();
+    }
+}
