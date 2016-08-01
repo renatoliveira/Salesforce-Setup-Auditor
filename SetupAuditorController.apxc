@@ -1,11 +1,12 @@
 public class SetupAuditorController
 {
     // list of modifications
-    public List<SetupAuditTrail> mods {get;set;}
+    public Map<Integer, List<SetupAuditTrail>> mods {get;set;}
+    public Integer currentPage {get;set;}
+    public Integer mapsize {get;set;}
     
     // filter entries
     public String filter {get;set;}
-    public Integer entries {get;set;}
     public DateTime modifications_from {get;set;}
     public DateTime modifications_to {get;set;}
     
@@ -15,8 +16,8 @@ public class SetupAuditorController
     
 	public SetupAuditorController()
     {
-        entries = 500;
-        mods = new List<SetupAuditTrail>();
+        dev = UserInfo.getUserId();
+        mods = new Map<Integer, List<SetupAuditTrail>>();
         modifications_to = Date.today();
         modifications_from = Date.today().addYears(-2);
         getAdministrators();
@@ -44,7 +45,8 @@ public class SetupAuditorController
     
     public void getModifications()
     {
-        if (entries > 50000) entries = 50000; // soql limit
+        currentPage = 1;
+        Integer pageIndex = 1;
         if (dev == null) return;
         List<SetupAuditTrail> setups = [SELECT
                                         Id
@@ -56,7 +58,7 @@ public class SetupAuditorController
                                         AND CreatedDate >= :modifications_from
                                         AND CreatedDate <= :modifications_to
                                         ORDER BY CreatedDate DESC
-                                        LIMIT :entries];
+                                        LIMIT 50000];
         
         Set<String> modificacoes = new Set<String>();
         mods.clear();
@@ -71,10 +73,21 @@ public class SetupAuditorController
             
             if (!modificacoes.contains(s.Display))
             {
-                mods.add(s);
+                if (mods.get(pageIndex) == null)
+                    mods.put(pageIndex, new List<SetupAuditTrail>());
+                
+                List<SetupAuditTrail> trails = mods.get(pageIndex);
+                trails.add(s);
+                
+                mods.put(pageIndex, trails);
                 modificacoes.add(s.Display);
+                
+                if (trails.size() == 100)
+                    pageIndex++;
             }
         }
+        
+        mapsize = mods.size();
     }
     
     public void getMyLastDayModifications()
@@ -83,5 +96,27 @@ public class SetupAuditorController
         modifications_from = DateTime.now().addHours(-24);
         modifications_to = DateTime.now();
         getModifications();
+    }
+    
+    public void nextPage()
+    {
+        if (currentPage < mods.size())
+        	currentPage++;
+    }
+    
+    public void previousPage()
+    {
+        if (currentPage > 1)
+        	currentPage--;
+    }
+    
+    public void lastPage()
+    {
+        currentPage = mods.size();
+    }
+    
+    public void firstPage()
+    {
+        currentPage = 1;
     }
 }

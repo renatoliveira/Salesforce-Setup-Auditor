@@ -5,5 +5,11 @@ public class SetupAuditTest
     {
         SetupAuditorController controller = new SetupAuditorController();
         controller.getMyLastDayModifications();
+        
+        // test buttons
+        controller.lastPage();
+        controller.firstPage();
+        controller.nextPage();
+        controller.previousPage();
     }
 }

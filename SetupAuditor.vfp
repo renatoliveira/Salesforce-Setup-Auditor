@@ -23,13 +23,7 @@
                     </apex:selectList>
                 </apex:pageBlockSectionItem>
                 <apex:pageBlockSectionItem >
-                    <apex:outputLabel for="numeromods" value="Number of entries (max 50000)"></apex:outputLabel>
-                    <apex:inputText id="numeromods" value="{!entries}">
-                        <apex:actionSupport rerender="form" action="{!getModifications}" status="loading" event="onchange"/>
-                    </apex:inputText>
-                </apex:pageBlockSectionItem>
-                <apex:pageBlockSectionItem >
-                    <apex:outputLabel for="filteruserid" value="Filter by user"></apex:outputLabel>
+                    <apex:outputLabel for="filteruserid" value="Filtrar por desenvolvedor"></apex:outputLabel>
                     <apex:selectList id="filteruserid" value="{!dev}" size="1" multiselect="false">
                         <apex:selectOptions value="{!devs}"></apex:selectOptions>
                         <apex:actionSupport rerender="form" action="{!getModifications}" status="loading" event="onchange"/>
@@ -37,25 +31,41 @@
                 </apex:pageBlockSectionItem>
             </apex:pageBlockSection>
             <apex:pageBlockSection title="By date" collapsible="false" columns="2">
-                <apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem >
                     <apex:outputLabel for="datefrom" value="From"></apex:outputLabel>
                     <apex:input id="datefrom" value="{!modifications_from}" type="datetime-local">
                         <apex:actionSupport rerender="form" action="{!getModifications}" status="loading" event="onblur"/>
                     </apex:input>
                 </apex:pageBlockSectionItem>
-                <apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem >
                     <apex:outputLabel for="dateto" value="To"></apex:outputLabel>
                     <apex:input id="dateto" value="{!modifications_to}" type="datetime-local">
                         <apex:actionSupport rerender="form" action="{!getModifications}" status="loading" event="onblur"/>
                     </apex:input>
                 </apex:pageBlockSectionItem>
             </apex:pageBlockSection>
-            <apex:pageBlockTable value="{!mods}" var="m">
-                <apex:column>
+            <center>
+                <span><apex:commandLink action="{!firstPage}" value="[First Page]" rerender="form" status="loading"/></span>
+                <span> - </span>
+                <span><apex:commandLink action="{!previousPage}" value="[Previous Page]" rerender="form" status="loading"/></span>
+                <span> - </span>
+                <span><apex:commandLink action="{!nextPage}" value="[Next Page]" rerender="form" status="loading"/></span>
+                <span> - </span>
+                <span><apex:commandLink action="{!lastPage}" value="[Last Page]" rerender="form" status="loading"/></span>
+            </center>
+            <right>
+            	<span>Viewing page {!currentPage} of {!mapsize} ({!currentPage * 1000 - 999}-{!currentPage * 1000})</span>
+            </right>
+            <apex:pageBlockTable value="{!mods[currentPage]}" var="m">
+                <apex:column >
                     <apex:image rendered="{!CONTAINS(m.Display, 'Created')}" url="{!URLFOR($Resource.GraphicsPack, '16/famfamfam/silk/add.png')}" />
                     <apex:image rendered="{!CONTAINS(m.Display, 'Deleted')}" url="{!URLFOR($Resource.GraphicsPack, '16/famfamfam/silk/delete.png')}" />
                     <apex:image rendered="{!CONTAINS(m.Display, 'Changed')}" url="{!URLFOR($Resource.GraphicsPack, '16/famfamfam/silk/pencil.png')}" />
                     <apex:image rendered="{!CONTAINS(m.Display, 'Installed')}" url="{!URLFOR($Resource.GraphicsPack, '16/famfamfam/silk/brick.png')}" />
+                    <apex:image rendered="{!CONTAINS(m.Display, 'Translation Workbench enabled')}" url="{!URLFOR($Resource.GraphicsPack, '16/fatcow/farmfresh/comments.png')}" />
+                    <apex:image rendered="{!CONTAINS(m.Display, 'Activated workflow rule')}" url="{!URLFOR($Resource.GraphicsPack, '16/fatcow/farmfresh/sitemap.png')}"/>
+                    <apex:image rendered="{!CONTAINS(m.Display, 'Deactivated workflow rule')}" url="{!URLFOR($Resource.GraphicsPack, '16/fatcow/farmfresh/sitemap.png')}"/>
+                    <apex:image rendered="{!CONTAINS(m.Display, 'Remote Proxy')}" url="{!URLFOR($Resource.GraphicsPack, '16/fatcow/farmfresh/connect.png')}" />
                 </apex:column>
                 <apex:column headerValue="Display" value="{!m.Display}"/>
                 <apex:column headerValue="Section" value="{!m.Section}"/>
