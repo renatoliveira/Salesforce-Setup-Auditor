@@ -1,0 +1,87 @@
+public class SetupAuditorController
+{
+    // list of modifications
+    public List<SetupAuditTrail> mods {get;set;}
+    
+    // filter entries
+    public String filter {get;set;}
+    public Integer entries {get;set;}
+    public DateTime modifications_from {get;set;}
+    public DateTime modifications_to {get;set;}
+    
+    // filter by user id
+    public String dev {get;set;}
+    public List<SelectOption> devs {get;set;}
+    
+	public SetupAuditorController()
+    {
+        entries = 500;
+        mods = new List<SetupAuditTrail>();
+        modifications_to = Date.today();
+        modifications_from = Date.today().addYears(-2);
+        getAdministrators();
+        getModifications();
+    }
+    
+    public void getAdministrators()
+    {
+        List<User> users = [SELECT
+                            Id
+                            ,FirstName
+                            ,LastName
+                            FROM User
+                            WHERE IsActive = true
+                            AND Profile.Name LIKE '%Admin%' ORDER BY FirstName];
+        
+        this.devs = new List<SelectOption>();
+
+        this.devs.add(new SelectOption('', '--NENHUM--'));
+        for (User u : users)
+        {
+            this.devs.add(new SelectOption(u.Id, u.FirstName + ' ' + u.LastName));
+        }
+    }
+    
+    public void getModifications()
+    {
+        if (entries > 50000) entries = 50000; // soql limit
+        if (dev == null) return;
+        List<SetupAuditTrail> setups = [SELECT
+                                        Id
+                                        ,Display
+                                        ,Section
+                                        ,CreatedDate
+                                        FROM SetupAuditTrail
+                                        WHERE CreatedById = :dev
+                                        AND CreatedDate >= :modifications_from
+                                        AND CreatedDate <= :modifications_to
+                                        ORDER BY CreatedDate DESC
+                                        LIMIT :entries];
+        
+        Set<String> modificacoes = new Set<String>();
+        mods.clear();
+        for (SetupAuditTrail s : setups)
+        {
+            if (s.Section == null) continue;
+            if (filter == 'class' && !s.Section.toLowerCase().contains('class')) continue;
+            if (filter == 'trigger' && !s.Section.toLowerCase().contains('trigger')) continue;
+            if (filter == 'page' && !s.Section.toLowerCase().contains('page')) continue;
+            if (filter == 'component' && !s.Section.toLowerCase().contains('component')) continue;
+            if (filter == 'other' && (s.Section.toLowerCase().contains('class') || s.Display.toLowerCase().contains('trigger') || s.Display.toLowerCase().contains('page'))) continue;
+            
+            if (!modificacoes.contains(s.Display))
+            {
+                mods.add(s);
+                modificacoes.add(s.Display);
+            }
+        }
+    }
+    
+    public void getMyLastDayModifications()
+    {
+        dev = UserInfo.getUserId();
+        modifications_from = DateTime.now().addHours(-24);
+        modifications_to = DateTime.now();
+        getModifications();
+    }
+}

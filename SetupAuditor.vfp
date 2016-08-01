@@ -1,0 +1,69 @@
+<apex:page docType="html-5.0" sidebar="false" controller="SetupAuditorController" language="en-US" tabStyle="Case">
+    <apex:sectionHeader subtitle="Setup changes"/>
+    <apex:form >
+        <apex:pageBlock id="form">
+            <center>
+                <apex:actionStatus id="loading" >
+                    <apex:facet name="start" >
+                        <img src="/img/loading.gif" />                   
+                    </apex:facet>
+                </apex:actionStatus>
+            </center>
+            <apex:pageBlockSection collapsible="false" title="Filters" columns="2">
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel for="tipomod" value="Type of change"></apex:outputLabel>
+                    <apex:selectList value="{!filter}" size="1" multiselect="false">
+                        <apex:selectOption itemValue="all" itemLabel="All"></apex:selectOption>
+                        <apex:selectOption itemValue="class" itemLabel="Class"></apex:selectOption>
+                        <apex:selectOption itemValue="trigger" itemLabel="Trigger"></apex:selectOption>
+                        <apex:selectOption itemValue="page" itemLabel="Visualforce Page"></apex:selectOption>
+                        <apex:selectOption itemValue="component" itemLabel="Visualforce Component"></apex:selectOption>
+                        <apex:selectOption itemValue="other" itemLabel="Other"></apex:selectOption>
+                        <apex:actionSupport rerender="form" action="{!getModifications}" status="loading" event="onchange"/>
+                    </apex:selectList>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel for="numeromods" value="Number of entries (max 50000)"></apex:outputLabel>
+                    <apex:inputText id="numeromods" value="{!entries}">
+                        <apex:actionSupport rerender="form" action="{!getModifications}" status="loading" event="onchange"/>
+                    </apex:inputText>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel for="filteruserid" value="Filtrar por desenvolvedor"></apex:outputLabel>
+                    <apex:selectList id="filteruserid" value="{!dev}" size="1" multiselect="false">
+                        <apex:selectOptions value="{!devs}"></apex:selectOptions>
+                        <apex:actionSupport rerender="form" action="{!getModifications}" status="loading" event="onchange"/>
+                    </apex:selectList>
+                </apex:pageBlockSectionItem>
+            </apex:pageBlockSection>
+            <apex:pageBlockSection title="By date" collapsible="false" columns="2">
+                <apex:pageBlockSectionItem>
+                    <apex:outputLabel for="datefrom" value="From"></apex:outputLabel>
+                    <apex:input id="datefrom" value="{!modifications_from}" type="datetime-local">
+                        <apex:actionSupport rerender="form" action="{!getModifications}" status="loading" event="onblur"/>
+                    </apex:input>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem>
+                    <apex:outputLabel for="dateto" value="To"></apex:outputLabel>
+                    <apex:input id="dateto" value="{!modifications_to}" type="datetime-local">
+                        <apex:actionSupport rerender="form" action="{!getModifications}" status="loading" event="onblur"/>
+                    </apex:input>
+                </apex:pageBlockSectionItem>
+            </apex:pageBlockSection>
+            <apex:pageBlockTable value="{!mods}" var="m">
+                <apex:column>
+                    <apex:image rendered="{!CONTAINS(m.Display, 'Created')}" url="{!URLFOR($Resource.GraphicsPack, '16/famfamfam/silk/add.png')}" />
+                    <apex:image rendered="{!CONTAINS(m.Display, 'Deleted')}" url="{!URLFOR($Resource.GraphicsPack, '16/famfamfam/silk/delete.png')}" />
+                    <apex:image rendered="{!CONTAINS(m.Display, 'Changed')}" url="{!URLFOR($Resource.GraphicsPack, '16/famfamfam/silk/pencil.png')}" />
+                    <apex:image rendered="{!CONTAINS(m.Display, 'Installed')}" url="{!URLFOR($Resource.GraphicsPack, '16/famfamfam/silk/brick.png')}" />
+                </apex:column>
+                <apex:column headerValue="Display" value="{!m.Display}"/>
+                <apex:column headerValue="Section" value="{!m.Section}"/>
+                <apex:column headerValue="Date" value="{!m.CreatedDate}"/>
+            </apex:pageBlockTable>
+            <apex:pageBlockButtons location="top">
+            	<apex:commandButton action="{!getMyLastDayModifications}" value="Get my last 24 hour modifications" rerender="form"/>
+            </apex:pageBlockButtons>
+        </apex:pageBlock>
+    </apex:form>
+</apex:page>

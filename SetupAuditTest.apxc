@@ -1,0 +1,9 @@
+@isTest(SeeAllData=true)
+public class SetupAuditTest
+{
+	@isTest public static void test_controller()
+    {
+        SetupAuditorController controller = new SetupAuditorController();
+        controller.getMyLastDayModifications();
+    }
+}
