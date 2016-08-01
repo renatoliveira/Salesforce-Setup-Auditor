@@ -23,7 +23,7 @@
                     </apex:selectList>
                 </apex:pageBlockSectionItem>
                 <apex:pageBlockSectionItem >
-                    <apex:outputLabel for="filteruserid" value="Filtrar por desenvolvedor"></apex:outputLabel>
+                    <apex:outputLabel for="filteruserid" value="Filter by user"></apex:outputLabel>
                     <apex:selectList id="filteruserid" value="{!dev}" size="1" multiselect="false">
                         <apex:selectOptions value="{!devs}"></apex:selectOptions>
                         <apex:actionSupport rerender="form" action="{!getModifications}" status="loading" event="onchange"/>
